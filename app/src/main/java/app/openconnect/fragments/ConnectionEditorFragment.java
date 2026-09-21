@@ -118,21 +118,7 @@ public class ConnectionEditorFragment extends PreferenceFragment
         // All settings consolidated into main screen
     }
 
-    private void configureNavigationPreference(String key, String screen) {
-        Preference preference = findPreference(key);
-        if (preference == null) {
-            return;
-        }
-        preference.setOnPreferenceClickListener(clicked -> {
-            Intent intent = new Intent(getActivity(), ConnectionEditorActivity.class);
-            intent.putExtra(ConnectionEditorActivity.EXTRA_PROFILE_UUID, mUUID);
-            intent.putExtra(ConnectionEditorActivity.EXTRA_SCREEN, screen);
-            startActivity(intent);
-            return true;
-        });
-    }
-
-    @Override
+	@Override
 	public void onResume() {
         super.onResume();
         getPreferenceScreen().getSharedPreferences()

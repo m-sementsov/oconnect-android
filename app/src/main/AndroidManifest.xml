@@ -117,13 +117,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="org.acra.CrashReportDialog"
-            android:theme="@style/Theme.OConnect.Dialog"
-            android:launchMode="singleInstance"
-            android:excludeFromRecents="true"
-            android:finishOnTaskLaunch="true" />
-
         <service
             android:name="app.openconnect.core.OpenVpnService"
             android:exported="true"
@@ -198,15 +191,6 @@
         </receiver>
         -->
 
-        <meta-data
-            android:name="xposedmodule"
-            android:value="true" />
-        <meta-data
-            android:name="xposeddescription"
-            android:value="Bypass Android VPN confirmation dialog" />
-        <meta-data
-            android:name="xposedminversion"
-            android:value="30" />
 
     </application>
 

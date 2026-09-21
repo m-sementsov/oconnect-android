@@ -7,3 +7,8 @@
 /captures
 .externalNativeBuild
 .*.sw*
+# legacy per-arch exec assets produced by `make -C external install`
+# (only app/src/main/assets/raw/noarch/* is source-controlled)
+/app/src/main/assets/raw/armeabi*/
+/app/src/main/assets/raw/arm64*/
+/app/src/main/assets/raw/x86*/

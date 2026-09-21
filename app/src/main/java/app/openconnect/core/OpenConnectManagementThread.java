@@ -527,20 +527,6 @@ public class OpenConnectManagementThread implements Runnable, OpenVPNManagement 
 		}
 	}
 
-	private boolean getSubnetPref(ArrayList<String> subnets) {
-		for (String s : getStringPref("split_tunnel_networks").split("[,\\s]+")) {
-			if (s.equals("")) {
-				continue;
-			}
-			subnets.add(s);
-		}
-		if (subnets.isEmpty()) {
-			log("ROUTE: split tunnel list is empty; check your VPN settings");
-			return false;
-		}
-		return true;
-	}
-
 	private void addDefaultRoutes(VpnService.Builder b, LibOpenConnect.IPInfo ip, ArrayList<String> subnets) {
 		boolean ip4def = true, ip6def = true;
 

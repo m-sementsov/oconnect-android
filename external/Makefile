@@ -1,4 +1,3 @@
-# ANDROID_NDK ?= $(HOME)/Android/Sdk/ndk/27.2.12479018
 ANDROID_NDK ?= $(HOME)/Android/Sdk/ndk/30.0.16248370
 ANDROID_API ?= 23
 ANDROID_LDFLAGS := -Wl,-z,max-page-size=16384
