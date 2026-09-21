@@ -481,6 +481,7 @@ public class OpenConnectManagementThread implements Runnable, OpenVPNManagement 
 		mOC.setPFS(getBoolPref("require_pfs"));
 
 		String os = getStringPref("reported_os");
+		if (os == null || os.isEmpty()) { os = "android"; }
 		mOC.setReportedOS(os);
 		if (os.equals("android") || os.equals("apple-ios")) {
 			// if ocserv sees the X-AnyConnect-Identifier-* "mobile headers" it
@@ -633,17 +634,10 @@ public class OpenConnectManagementThread implements Runnable, OpenVPNManagement 
 
 		ArrayList<String> subnets = new ArrayList<String>(), dns = ip.DNS;
 		String domain = ip.domain;
+		boolean perAppEnabled = getBoolPref("split_tunnel_apps_enabled");
 
-		if (getStringPref("split_tunnel_mode").equals("on_vpn_dns")) {
-			getSubnetPref(subnets);
-		} else if (getStringPref("split_tunnel_mode").equals("on_uplink_dns")) {
-			getSubnetPref(subnets);
-			dns = new ArrayList<String>();
-			domain = null;
-		} else {
-			subnets = ip.splitIncludes;
-			addDefaultRoutes(b, ip, subnets);
-		}
+		subnets = ip.splitIncludes;
+		addDefaultRoutes(b, ip, subnets);
 		addSubnetRoutes(b, ip, subnets);
 
 		/* DNS */
@@ -664,6 +658,42 @@ public class OpenConnectManagementThread implements Runnable, OpenVPNManagement 
 		}
 
 		mOpenVPNService.setIPInfo(this, ip, mOC.getHostname());
+	}
+
+	/*
+	 * Per-app VPN (whitelist only, mirrors v2RayNG-style split tunneling).
+	 * Only apps explicitly selected by the user will have their traffic
+	 * routed through the tunnel; everything else bypasses the VPN.
+	 */
+	private void applyAppFilter(VpnService.Builder b) {
+		if (!getBoolPref("split_tunnel_apps_enabled")) {
+			return;
+		}
+
+		String pkgList = getStringPref("split_tunnel_apps_list");
+		if (pkgList == null || pkgList.trim().isEmpty()) {
+			log("APP FILTER: per-app VPN is enabled but no apps are selected");
+			return;
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+			b.setUnderlyingNetworks(null);
+		}
+
+		int count = 0;
+		for (String pkg : pkgList.split(",")) {
+			pkg = pkg.trim();
+			if (pkg.isEmpty()) {
+				continue;
+			}
+			try {
+				b.addAllowedApplication(pkg);
+				count++;
+			} catch (android.content.pm.PackageManager.NameNotFoundException e) {
+				log("APP FILTER: skipping " + pkg + " (no longer installed)");
+			}
+		}
+		log("APP FILTER: routing " + count + " app(s) through the VPN tunnel");
 	}
 
 	private void errorAlert(String message) {
@@ -748,6 +778,7 @@ public class OpenConnectManagementThread implements Runnable, OpenVPNManagement 
 
 		VpnService.Builder b = mOpenVPNService.getVpnServiceBuilder();
 		setIPInfo(b);
+		applyAppFilter(b);
 
 		ParcelFileDescriptor pfd;
 		try {

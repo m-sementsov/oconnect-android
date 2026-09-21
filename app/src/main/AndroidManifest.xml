@@ -14,6 +14,10 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
+    <!-- Needed to enumerate all installed apps for the per-app VPN picker -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <!-- Copy the <permission> block to your app when using the REMOTE API. Otherwise OConnect
         needs to be installed first -->
@@ -98,6 +102,9 @@
 
             </activity>
         <activity android:name="app.openconnect.FileSelect" />
+        <activity
+            android:name="app.openconnect.AppSelectActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="app.openconnect.MainActivity"
             android:exported="true"

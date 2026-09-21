@@ -282,6 +282,14 @@
     <string name="split_tunnel_mode">Split tunnel mode</string>
     <string name="split_tunnel_networks">Split tunnel networks</string>
     <string name="split_tunnel_networks_message">Enter a comma-separated list of subnets to route over the VPN link.  Example:\n\n192.168.22.0/24, 10.15.0.0/16</string>
+    <string name="split_tunnel_apps_enabled">Per-app VPN</string>
+    <string name="split_tunnel_apps_enabled_summary">Only route traffic from selected apps through the VPN</string>
+    <string name="split_tunnel_apps_select">Select apps</string>
+    <string name="split_tunnel_apps_none_selected">No apps selected</string>
+    <string name="split_tunnel_apps_selected_count">%1$d app(s) selected</string>
+    <string name="app_select_title">Select apps</string>
+    <string name="app_select_search_hint">Search apps</string>
+    <string name="app_select_show_system">Show system apps</string>
     <string name="timestamp_format">Log timestamp format</string>
     <string name="timestamp_short">Time only</string>
     <string name="timestamp_long">Date + time</string>

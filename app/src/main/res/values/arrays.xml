@@ -43,12 +43,10 @@
     <string-array name="split_tunnel_mode_entries">
         <item>Auto</item>
         <item>On - DNS uses VPN</item>
-        <item>On - DNS uses uplink</item>
     </string-array>
     <string-array name="split_tunnel_mode_values" translatable="false">
         <item>auto</item>
         <item>on_vpn_dns</item>
-        <item>on_uplink_dns</item>
     </string-array>
 
     <string-array name="log_timestamp_entries" translatable="false">

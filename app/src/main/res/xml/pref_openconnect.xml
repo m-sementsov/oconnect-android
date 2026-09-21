@@ -17,19 +17,26 @@
             android:dialogMessage="@string/add_profile_hostname_prompt"
             android:inputType="textVisiblePassword|textNoSuggestions"
             android:defaultValue="" />
+        <app.openconnect.ShowTextPreference
+            android:key="user_certificate"
+            android:title="P12 key"
+            android:layout="@layout/preference_standard_compact"
+            android:defaultValue="" />
     </PreferenceCategory>
 
-    <Preference
-        android:key="pref_key_authentication"
-        android:icon="@drawable/ic_security_24"
-        android:layout="@layout/preference_navigation"
-        android:summary="@string/authentication_settings_summary"
-        android:title="@string/authentication" />
-
-    <Preference
-        android:key="pref_key_advanced"
-        android:icon="@drawable/ic_settings_24"
-        android:layout="@layout/preference_navigation"
-        android:summary="@string/advanced_profile_settings_summary"
-        android:title="@string/advanced" />
+    <PreferenceCategory
+        android:layout="@layout/preference_category_header"
+        android:title="@string/split_tunnel_apps_enabled">
+        <SwitchPreference
+            android:key="split_tunnel_apps_enabled"
+            android:title="@string/split_tunnel_apps_enabled"
+            android:layout="@layout/preference_standard_compact"
+            android:summary="@string/split_tunnel_apps_enabled_summary"
+            android:defaultValue="false" />
+        <Preference
+            android:key="split_tunnel_apps_select"
+            android:title="@string/split_tunnel_apps_select"
+            android:layout="@layout/preference_standard_compact"
+            android:dependency="split_tunnel_apps_enabled" />
+    </PreferenceCategory>
 </PreferenceScreen>

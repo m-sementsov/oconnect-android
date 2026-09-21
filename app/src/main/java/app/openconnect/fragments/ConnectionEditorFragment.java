@@ -27,6 +27,7 @@ package app.openconnect.fragments;
 import java.util.HashMap;
 import java.util.Map;
 
+import app.openconnect.AppSelectActivity;
 import app.openconnect.ConnectionEditorActivity;
 import app.openconnect.PreferenceScreenStyler;
 import app.openconnect.R;
@@ -67,6 +68,7 @@ public class ConnectionEditorFragment extends PreferenceFragment
     HashMap<String,Integer> fileSelectMap = new HashMap<String,Integer>();
 
     private final int IDX_TOKEN_STRING = 65536;
+    private final int IDX_APP_SELECT = 65537;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,8 +101,8 @@ public class ConnectionEditorFragment extends PreferenceFragment
         for (String key : new String[] {
                 "profile_name", "server_address", "ca_certificate", "user_certificate",
                 "private_key", "software_token", "token_string", "batch_mode",
-                "reported_os", "custom_csd_wrapper", "split_tunnel_mode",
-                "split_tunnel_networks", "dpd_value"
+                "custom_csd_wrapper",
+                "split_tunnel_apps_list"
         }) {
             updatePref(sp, key);
         }
@@ -113,10 +115,7 @@ public class ConnectionEditorFragment extends PreferenceFragment
     }
 
     private void configureNavigation() {
-        configureNavigationPreference("pref_key_authentication",
-                ConnectionEditorActivity.SCREEN_AUTHENTICATION);
-        configureNavigationPreference("pref_key_advanced",
-                ConnectionEditorActivity.SCREEN_ADVANCED);
+        // All settings consolidated into main screen
     }
 
     private void configureNavigationPreference(String key, String screen) {
@@ -216,11 +215,19 @@ public class ConnectionEditorFragment extends PreferenceFragment
             }
         }
 
-        /* similarly, if split tunnel is "auto", ignore manually entered subnets */
-        if (key.equals("split_tunnel_mode")) {
-            pref = findPreference("split_tunnel_networks");
+
+
+        /* show how many apps are selected as the summary of the picker entry */
+        if (key.equals("split_tunnel_apps_list")) {
+            pref = findPreference("split_tunnel_apps_select");
             if (pref != null) {
-                pref.setEnabled(!value.equals("auto"));
+                int count = 0;
+                if (value != null && !value.trim().isEmpty()) {
+                    count = value.split(",").length;
+                }
+                pref.setSummary(count == 0
+                        ? getString(R.string.split_tunnel_apps_none_selected)
+                        : getString(R.string.split_tunnel_apps_selected_count, count));
             }
         }
 
@@ -285,6 +292,18 @@ public class ConnectionEditorFragment extends PreferenceFragment
 			});
 		}
 
+		Preference appSelect = findPreference("split_tunnel_apps_select");
+		if (appSelect != null) {
+			appSelect.setOnPreferenceClickListener(preference -> {
+				String current = mPrefs.getSharedPreferences()
+						.getString("split_tunnel_apps_list", "");
+				Intent intent = new Intent(getActivity(), AppSelectActivity.class);
+				intent.putExtra(AppSelectActivity.EXTRA_SELECTED, current);
+				startActivityForResult(intent, IDX_APP_SELECT);
+				return true;
+			});
+		}
+
 		Preference p = findPreference("token_string");
         if (p == null) {
             return;
@@ -324,7 +343,13 @@ public class ConnectionEditorFragment extends PreferenceFragment
 		}
 
 		SharedPreferences prefs = mPrefs.getSharedPreferences();
-		if (idx >= IDX_TOKEN_STRING) {
+		if (idx == IDX_APP_SELECT) {
+			String result = data == null ? null
+					: data.getStringExtra(AppSelectActivity.EXTRA_RESULT);
+			prefs.edit().putString("split_tunnel_apps_list",
+					result == null ? "" : result).commit();
+			updatePref(prefs, "split_tunnel_apps_list");
+		} else if (idx >= IDX_TOKEN_STRING) {
 			updatePref(prefs, "token_string");
 			updatePref(prefs, "software_token");
 		} else {

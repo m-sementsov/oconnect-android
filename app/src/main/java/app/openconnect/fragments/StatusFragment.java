@@ -36,6 +36,24 @@ import app.openconnect.ConnectionEditorActivity;
 import app.openconnect.FragActivity;
 import app.openconnect.R;
 import app.openconnect.VpnProfile;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.widget.EditText;
+import android.database.Cursor;
+import android.provider.OpenableColumns;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+
+import android.widget.TextView;
+import android.widget.Toast;
+import com.google.android.material.materialswitch.MaterialSwitch;
+import app.openconnect.AppSelectActivity;
+import app.openconnect.core.ProfileManager;
+
 import app.openconnect.api.GrantPermissionsActivity;
 import app.openconnect.core.OpenConnectManagementThread;
 import app.openconnect.core.OpenVpnService;
@@ -44,6 +62,9 @@ import app.openconnect.core.VPNConnector;
 import app.openconnect.update.GitHubUpdateChecker;
 
 public class StatusFragment extends Fragment {
+    private static final int REQ_PICK_P12 = 7001;
+    private static final int REQ_SELECT_APPS = 7002;
+
 
 	private static final int MENU_CHECK_UPDATES = 1;
 	private static final int MENU_SECURID = 2;
@@ -63,16 +84,8 @@ public class StatusFragment extends Fragment {
 		styleWordmark();
 		mDisconnectButton.setOnClickListener(view -> handlePrimaryAction());
 
-		mView.findViewById(R.id.current_profile_row).setOnClickListener(
-				view -> handleProfileRow());
-		mView.findViewById(R.id.connection_details_row).setOnClickListener(
-				view -> startFragment("ConnectionDetailsFragment"));
-		mView.findViewById(R.id.dashboard_settings_row).setOnClickListener(
-				view -> startFragment("GeneralSettings"));
-		mView.findViewById(R.id.dashboard_help_row).setOnClickListener(
-				view -> showHelpAndAbout());
-		mView.findViewById(R.id.dashboard_overflow).setOnClickListener(
-				this::showOverflowMenu);
+		mView.findViewById(R.id.dashboard_overflow).setVisibility(View.GONE);
+		initDashboardControls();
 
 		mConn = new VPNConnector(getActivity(), false) {
 			@Override
@@ -128,86 +141,69 @@ public class StatusFragment extends Fragment {
 
 	private void showConnectedState(OpenVpnService service) {
 		setStatusBadgeVisible(true);
-		setConnectionDetailsVisible(true);
 		setTrafficVisible(true);
-		writeText(R.id.current_profile_label, getString(R.string.dashboard_current_profile));
 		writeProfile(service);
-			writeText(R.id.connection_state, getString(R.string.dashboard_connected));
-			writeText(R.id.connection_time, service.startTime == null
-					? getString(R.string.connection_status_progress_message)
-					: OpenVpnService.formatElapsedTime(service.startTime.getTime()));
-			writeText(R.id.connection_traffic, mConn.statsValid
-					? mConn.getByteCountSummary()
-					: getString(R.string.dashboard_traffic_loading));
-			mDisconnectButton.setText(R.string.disconnect);
-			mDisconnectButton.setIconResource(R.drawable.ic_power_settings_new_24);
+		writeText(R.id.connection_state, getString(R.string.dashboard_connected));
+		writeText(R.id.connection_time, service.startTime == null
+				? getString(R.string.connection_status_progress_message)
+				: OpenVpnService.formatElapsedTime(service.startTime.getTime()));
+		writeText(R.id.connection_traffic, mConn.statsValid
+				? mConn.getByteCountSummary()
+				: getString(R.string.dashboard_traffic_loading));
+		mDisconnectButton.setText(R.string.disconnect);
+		mDisconnectButton.setIconResource(R.drawable.ic_power_settings_new_24);
+		updateCardUI();
 	}
 
 	private void showProgressState(OpenVpnService service) {
 		setStatusBadgeVisible(false);
-		setConnectionDetailsVisible(true);
 		setTrafficVisible(true);
-		writeText(R.id.current_profile_label, getString(R.string.dashboard_current_profile));
 		writeProfile(service);
-			writeText(R.id.connection_state, service.getConnectionStateName());
-			writeText(R.id.connection_time,
-					getString(R.string.connection_status_progress_message));
-			writeText(R.id.connection_traffic, getServerName(service, mSelectedProfile));
-			mDisconnectButton.setText(R.string.disconnect);
-			mDisconnectButton.setIconResource(R.drawable.ic_close_24);
+		writeText(R.id.connection_state, service.getConnectionStateName());
+		writeText(R.id.connection_time,
+				getString(R.string.connection_status_progress_message));
+		writeText(R.id.connection_traffic, getServerName(service, mSelectedProfile));
+		mDisconnectButton.setText(R.string.disconnect);
+		mDisconnectButton.setIconResource(R.drawable.ic_close_24);
+		updateCardUI();
 	}
 
 	private void showDisconnectedState(OpenVpnService service) {
-		boolean hasProfile = mSelectedProfile != null;
 		setStatusBadgeVisible(false);
-		setConnectionDetailsVisible(hasProfile);
 		setTrafficVisible(false);
 		writeText(R.id.connection_state, getString(R.string.dashboard_disconnected));
-		writeText(R.id.current_profile_label, getString(R.string.dashboard_vpn_profiles));
 
-		if (hasProfile) {
+		if (mSelectedProfile != null) {
 			writeText(R.id.connection_profile, mSelectedProfile.getName());
 			writeText(R.id.connection_time, getString(R.string.dashboard_ready_to_connect));
-			writeText(R.id.current_profile_name, mSelectedProfile.getName());
-			writeText(R.id.current_profile_server,
-					getServerName(service, mSelectedProfile));
 			mDisconnectButton.setText(R.string.dashboard_connect);
 			mDisconnectButton.setIconResource(R.drawable.ic_power_settings_new_24);
 		} else {
-			writeText(R.id.connection_profile, getString(R.string.dashboard_no_profiles));
-			writeText(R.id.connection_time, getString(R.string.dashboard_add_profile_hint));
-			writeText(R.id.current_profile_name, getString(R.string.dashboard_no_profiles));
-			writeText(R.id.current_profile_server,
-					getString(R.string.dashboard_add_profile_hint));
-			mDisconnectButton.setText(R.string.empty_profiles_cta);
-			mDisconnectButton.setIconResource(R.drawable.ic_add_24);
+			writeText(R.id.connection_profile, "VPN");
+			writeText(R.id.connection_time, getString(R.string.dashboard_ready_to_connect));
+			mDisconnectButton.setText(R.string.dashboard_connect);
+			mDisconnectButton.setIconResource(R.drawable.ic_power_settings_new_24);
 		}
+		updateCardUI();
 	}
 
 	private void writeProfile(OpenVpnService service) {
 		String profileName = mSelectedProfile == null
-				? getString(R.string.unknown)
+				? "VPN"
 				: mSelectedProfile.getName();
 		writeText(R.id.connection_profile, profileName);
-		writeText(R.id.current_profile_name, profileName);
-		writeText(R.id.current_profile_server, getServerName(service, mSelectedProfile));
 	}
 
 	private VpnProfile resolveProfile(OpenVpnService service) {
-		if (service.profile != null) {
+		if (service != null && service.profile != null) {
 			return service.profile;
 		}
-		VpnProfile reconnect = ProfileManager.get(service.getReconnectUUID());
-		if (reconnect != null) {
-			return reconnect;
+		List<VpnProfile> profiles = new ArrayList<VpnProfile>(ProfileManager.getProfiles());
+		if (!profiles.isEmpty()) {
+			Collections.sort(profiles);
+			return profiles.get(0);
 		}
-		List<VpnProfile> profiles = new ArrayList<VpnProfile>(
-				ProfileManager.getProfiles());
-		if (profiles.isEmpty()) {
-			return null;
-		}
-		Collections.sort(profiles);
-		return profiles.get(0);
+		return ProfileManager.create("My VPN");
 	}
 
 	private void setStatusBadgeVisible(boolean visible) {
@@ -216,10 +212,6 @@ public class StatusFragment extends Fragment {
 	}
 
 	private void setConnectionDetailsVisible(boolean visible) {
-		mView.findViewById(R.id.connection_details_divider).setVisibility(
-				visible ? View.VISIBLE : View.GONE);
-		mView.findViewById(R.id.connection_details_row).setVisibility(
-				visible ? View.VISIBLE : View.GONE);
 	}
 
 	private void setTrafficVisible(boolean visible) {
@@ -324,4 +316,183 @@ public class StatusFragment extends Fragment {
 		});
 		popup.show();
 	}
+
+    private void initDashboardControls() {
+        mSelectedProfile = resolveProfile(mConn != null ? mConn.service : null);
+        if (mSelectedProfile == null) return;
+        SharedPreferences sp = mSelectedProfile.mPrefs;
+
+        // 1. Сервер
+        View rowServer = mView.findViewById(R.id.row_server);
+        if (rowServer != null) {
+            rowServer.setOnClickListener(v -> showEditServerDialog());
+        }
+
+        // 2. P12 Key
+        View rowP12 = mView.findViewById(R.id.row_p12_key);
+        if (rowP12 != null) {
+            rowP12.setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                startActivityForResult(intent, REQ_PICK_P12);
+            });
+        }
+
+        // 3. Тумблер Per-app VPN
+        MaterialSwitch perAppSwitch = mView.findViewById(R.id.switch_per_app);
+        if (perAppSwitch != null) {
+            perAppSwitch.setChecked(sp.getBoolean("split_tunnel_apps_enabled", false));
+            perAppSwitch.setOnCheckedChangeListener((btn, isChecked) -> {
+                sp.edit().putBoolean("split_tunnel_apps_enabled", isChecked).commit();
+                updateCardUI();
+            });
+        }
+
+        // 4. Выбор приложений
+        View rowApps = mView.findViewById(R.id.row_select_apps);
+        if (rowApps != null) {
+            rowApps.setOnClickListener(v -> {
+                String current = sp.getString("split_tunnel_apps_list", "");
+                Intent intent = new Intent(getActivity(), AppSelectActivity.class);
+                intent.putExtra(AppSelectActivity.EXTRA_SELECTED, current);
+                startActivityForResult(intent, REQ_SELECT_APPS);
+            });
+        }
+
+        updateCardUI();
+    }
+
+    private void updateCardUI() {
+        if (mView == null) return;
+        if (mSelectedProfile == null) {
+            mSelectedProfile = resolveProfile(mConn != null ? mConn.service : null);
+        }
+        if (mSelectedProfile == null) return;
+        SharedPreferences sp = mSelectedProfile.mPrefs;
+
+        // Сервер
+        TextView textServer = mView.findViewById(R.id.text_server_address);
+        if (textServer != null) {
+            String s = sp.getString("server_address", "");
+            textServer.setText(s.isEmpty() ? getString(R.string.add_profile_hostname_prompt) : s);
+        }
+
+        // P12 Key статус
+        TextView textP12 = mView.findViewById(R.id.text_p12_status);
+        if (textP12 != null) {
+            String cert = sp.getString("user_certificate", "");
+            String customName = sp.getString("user_certificate_display_name", "");
+            if (cert.isEmpty()) {
+                textP12.setText(R.string.unknown);
+            } else if (!customName.isEmpty()) {
+                textP12.setText(customName);
+            } else {
+                textP12.setText("user.p12");
+            }
+        }
+
+        // Количество выбранных приложений
+        boolean perAppOn = sp.getBoolean("split_tunnel_apps_enabled", false);
+        View dividerApps = mView.findViewById(R.id.divider_select_apps);
+        View rowApps = mView.findViewById(R.id.row_select_apps);
+        if (dividerApps != null) dividerApps.setVisibility(perAppOn ? View.VISIBLE : View.GONE);
+        if (rowApps != null) rowApps.setVisibility(perAppOn ? View.VISIBLE : View.GONE);
+
+        TextView textApps = mView.findViewById(R.id.text_apps_count);
+        if (textApps != null) {
+            String list = sp.getString("split_tunnel_apps_list", "");
+            int count = (list == null || list.trim().isEmpty()) ? 0 : list.split(",").length;
+            textApps.setText(count == 0 ? getString(R.string.split_tunnel_apps_none_selected)
+                    : getString(R.string.split_tunnel_apps_selected_count, count));
+        }
+    }
+
+    private void showEditServerDialog() {
+        if (mSelectedProfile == null) return;
+        EditText input = new EditText(getActivity());
+        input.setSingleLine(true);
+        input.setHint(R.string.add_profile_hostname_prompt);
+        String currentServer = mSelectedProfile.mPrefs.getString("server_address", "");
+        input.setText(currentServer);
+        input.setSelection(currentServer.length());
+
+        // Добавляем правильные отступы Material Design
+        FrameLayout container = new FrameLayout(getActivity());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        int marginH = (int) (24 * getResources().getDisplayMetrics().density);
+        int marginV = (int) (8 * getResources().getDisplayMetrics().density);
+        params.leftMargin = marginH;
+        params.rightMargin = marginH;
+        params.topMargin = marginV;
+        params.bottomMargin = marginV;
+        input.setLayoutParams(params);
+        container.addView(input);
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.server_address)
+                .setView(container)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    String newServer = input.getText().toString().trim();
+                    mSelectedProfile.mPrefs.edit().putString("server_address", newServer).commit();
+                    updateCardUI();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK || data == null) return;
+        if (mSelectedProfile == null) {
+            mSelectedProfile = resolveProfile(mConn != null ? mConn.service : null);
+        }
+        if (mSelectedProfile == null) return;
+        SharedPreferences sp = mSelectedProfile.mPrefs;
+
+        if (requestCode == REQ_PICK_P12) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                // Извлекаем настоящее имя файла (например, user.p12)
+                String displayName = null;
+                Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
+                if (cursor != null) {
+                    try {
+                        if (cursor.moveToFirst()) {
+                            int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                            if (nameIndex != -1) {
+                                displayName = cursor.getString(nameIndex);
+                            }
+                        }
+                    } finally {
+                        cursor.close();
+                    }
+                }
+                if (displayName == null) {
+                    displayName = uri.getLastPathSegment();
+                }
+
+                String storedPath = ProfileManager.storeFilePref(
+                        mSelectedProfile, "user_certificate", getActivity().getContentResolver(), uri);
+                if (storedPath != null) {
+                    SharedPreferences.Editor ed = sp.edit().putString("user_certificate", storedPath);
+                    if (displayName != null) {
+                        ed.putString("user_certificate_display_name", displayName);
+                    }
+                    ed.commit();
+                    updateCardUI();
+                    Toast.makeText(getActivity(), "P12 key imported!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), R.string.import_error_message, Toast.LENGTH_LONG).show();
+                }
+            }
+        } else if (requestCode == REQ_SELECT_APPS) {
+            String result = data.getStringExtra(AppSelectActivity.EXTRA_RESULT);
+            sp.edit().putString("split_tunnel_apps_list", result == null ? "" : result).commit();
+            updateCardUI();
+        }
+    }
+
 }
