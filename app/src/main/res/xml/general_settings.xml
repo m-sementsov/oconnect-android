@@ -1,55 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/common_settings">
+
+    <PreferenceCategory android:title="@string/category_general">
         <ListPreference
-                android:defaultValue="__last_used__"
-                android:dialogTitle="@string/quick_settings_default_profile"
-                android:key="quick_settings_profile"
-                android:layout="@layout/preference_standard_compact"
-                android:summary="@string/quick_settings_default_profile_summary"
-                android:title="@string/quick_settings_default_profile" />
-
-        <SwitchPreference
-                android:defaultValue="true"
-                android:key="netchangereconnect"
-                android:layout="@layout/preference_standard_compact"
-                android:summary="@string/netchange_summary"
-                android:title="@string/netchange"/>
-
-        <SwitchPreference
-                android:defaultValue="false"
-                android:key="screenoff"
-                android:layout="@layout/preference_standard_compact"
-                android:summary="@string/screenoff_summary"
-                android:title="@string/screenoff_title"/>
-
-        <SwitchPreference
-                android:defaultValue="true"
-                android:key="notify_user_input"
-                android:layout="@layout/preference_standard_compact"
-                android:summary="@string/notify_user_input_summary"
-                android:title="@string/notify_user_input"/>
+            android:key="app_lang"
+            android:title="@string/language_title"
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
+            android:defaultValue="ru" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/update_settings">
-        <SwitchPreference
-                android:defaultValue="true"
-                android:key="auto_check_updates"
-                android:layout="@layout/preference_standard_compact"
-                android:summary="@string/auto_check_updates_summary"
-                android:title="@string/auto_check_updates"/>
+    <PreferenceCategory android:title="@string/category_about">
+        <Preference
+            android:key="app_version"
+            android:title="@string/app_version_title"
+            android:selectable="false" />
 
         <Preference
-                android:key="check_for_updates"
-                android:layout="@layout/preference_standard_compact"
-                android:persistent="false"
-                android:summary="@string/check_for_updates_summary"
-                android:title="@string/check_for_updates"/>
+            android:key="about_app"
+            android:title="@string/about_openconnect" />
     </PreferenceCategory>
 
-    <Preference
-            android:key="advanced_general_settings"
-            android:layout="@layout/preference_navigation_compact"
-            android:summary="@string/advanced_general_settings_summary"
-            android:title="@string/advanced" />
 </PreferenceScreen>

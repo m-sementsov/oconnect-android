@@ -24,6 +24,14 @@
     <string name="needs_work">Needs work</string>
     <string name="maybe_later">Maybe later</string>
     <string name="help_with_translations">Help with translations</string>
+    <string name="profile_unconfigured">Not configured</string>
+    <string name="p12_key_required">PKCS#12 certificate is required</string>
+    <string name="default_profile_name">Default</string>
+    <string name="category_general">General</string>
+    <string name="category_power">Power saving</string>
+    <string name="category_about">About</string>
+    <string name="language_title">Interface language</string>
+    <string name="app_version_title">App version</string>
     <string name="about_openconnect">About OConnect</string>
     <string name="about_title">About</string>
     <string name="about_version">OConnect v%1$s</string>
@@ -59,12 +67,15 @@
     <string name="configure_the_vpn">Configure the VPN</string>
     <string name="menu_add_profile">Add VPN profile</string>
     <string name="add_profile_hostname_prompt">Enter the hostname, IP address, or URL:</string>
+    <string name="server_address_example">192.168.1.1:8443 // my-vpn.net:8443</string>
     <string name="hostname_examples">Valid formats include:\nvpn.example.com (typical usage)\nvpn.example.com:443 (host:port)\nhttps://vpn.example.com/my-group-url</string>
     <string name="disconnect">Disconnect</string>
+    <string name="disconnect_vpn">Disconnect VPN</string>
     <string name="reconnect">Reconnect</string>
     <string name="reconnect_to">Reconnect to %1$s</string>
     <string name="clear_log">Clear log</string>
     <string name="share_log">Share log</string>
+    <string name="split_tunnel_apps_reconnect_warning">App list changed, VPN reconnection required</string>
     <string name="log_share_subject">OConnect connection log</string>
     <string name="log_empty_title">No connection log yet</string>
     <string name="log_empty_summary">Connect to a VPN to see connection progress and diagnostic details here.</string>
@@ -103,6 +114,7 @@
     <string name="file_icon">file icon</string>
     <string name="file_access_unavailable">This folder cannot be read. Check storage permission or choose another location.</string>
     <string name="generalsettings">Settings</string>
+    <string name="show_log">Show log</string>
     <string name="owner_fix_summary">Tries to set the owner of /dev/tun to the \'system\' UID (1000). Some CM9 images need this to make the VPNService API work. Requires root.</string>
     <string name="owner_fix">Fix ownership of /dev/tun</string>
     <string name="edit_profile_title">Edit %s</string>
@@ -194,7 +206,7 @@
     <string name="connection_status_disconnected">Disconnected</string>
     <string name="connection_status_disconnected_message">Choose a profile from the Profiles tab to start a VPN connection.</string>
     <string name="connection_status_reconnect_message">Last session was %1$s. Reconnect to try again, or choose another profile.</string>
-    <string name="connection_status_progress_message">Keep OConnect open and respond to any login, certificate, or token prompts.</string>
+    <string name="connection_status_progress_message">Establishing secure connection...</string>
     <string name="log_state_disconnected">Disconnected - choose a profile to connect</string>
     <string name="log_state_reconnect">Disconnected - reconnect to %1$s or choose another profile</string>
     <string name="log_state_connected">Connected%1$s</string>
@@ -216,8 +228,8 @@
     <string name="no_external_app_allowed">No app allowed to use external API</string>
     <string name="allowed_apps">Allowed apps: %s</string>
     <string name="clearappsdialog">Clear list of allowed external apps?\nCurrent list of allowed apps:\n\n%s</string>
-    <string name="screenoff_summary">Save power, but background connectivity may be interrupted.</string>
-    <string name="screenoff_title">Pause when screen is off</string>
+    <string name="screenoff_title">Pause when locked</string>
+    <string name="screenoff_summary">Save power, but background connectivity may be interrupted</string>
     <string name="save_password">Save sign-in details</string>
     <string name="show_password">Show password</string>
     <string name="login_username">Username</string>
@@ -285,7 +297,7 @@
     <string name="split_tunnel_apps_enabled">Per-app VPN</string>
     <string name="split_tunnel_apps_enabled_summary">Only route traffic from selected apps through the VPN</string>
     <string name="split_tunnel_apps_select">Select apps</string>
-    <string name="split_tunnel_apps_none_selected">No apps selected</string>
+    <string name="split_tunnel_apps_none_selected">All traffic (tap to choose apps)</string>
     <string name="split_tunnel_apps_selected_count">%1$d app(s) selected</string>
     <string name="app_select_title">Select apps</string>
     <string name="app_select_search_hint">Search apps</string>
@@ -327,4 +339,10 @@
     <string name="dashboard_traffic_loading">Loading traffic data…</string>
     <string name="connection_details_title">Connection details</string>
     <string name="connection_details_unavailable">Connection information is unavailable.</string>
+    <string name="p12_key">P12 Key</string>
+    <string name="split_tunnel_apps_reconnecting">Updating app routing...</string>
+    <string name="p12_key_imported">P12 key successfully imported!</string>
+    <string name="p12_dialog_title">PKCS#12 Key Password</string>
+    <string name="p12_password_prompt">Enter PKCS#12 key password</string>
+
 </resources>

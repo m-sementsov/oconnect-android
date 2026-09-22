@@ -33,40 +33,32 @@ import app.openconnect.R;
 
 public class CommonMenu {
 
-	private static final int MENU_SETTINGS = 15;
-	private static final int MENU_SECURID = 20;
-	private static final int MENU_ABOUT = 30;
+        private static final int MENU_SETTINGS = 15;
+        private static final int MENU_ABOUT = 30;
 
-	private Context mContext;
+        private Context mContext;
 
-	public CommonMenu(Context ctx, Menu menu, boolean isConnected) {
-		mContext = ctx;
-		menu.add(Menu.NONE, MENU_SETTINGS, Menu.NONE, R.string.generalsettings)
-			.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-		menu.add(Menu.NONE, MENU_SECURID, Menu.NONE, R.string.securid_info)
-			.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-		menu.add(Menu.NONE, MENU_ABOUT, Menu.NONE, R.string.about_openconnect)
-			.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-	}
+        public CommonMenu(Context ctx, Menu menu, boolean isConnected) {
+                mContext = ctx;
+                // Очищено: больше не внедряем Настройки и Информацию в экран журнала
+        }
 
-	private boolean startFragActivity(String fragName) {
-		Intent intent = new Intent(mContext, FragActivity.class);
-		intent.putExtra(FragActivity.EXTRA_FRAGMENT_NAME, fragName);
-		mContext.startActivity(intent);
-		return true;
-	}
+        private boolean startFragActivity(String fragName) {
+                Intent intent = new Intent(mContext, FragActivity.class);
+                intent.putExtra(FragActivity.EXTRA_FRAGMENT_NAME, fragName);
+                mContext.startActivity(intent);
+                return true;
+        }
 
-	public boolean onOptionsItemSelected(MenuItem item) {
-		final int itemId = item.getItemId();
-		if (itemId == MENU_ABOUT) {
-			return startFragActivity("AboutFragment");
-		} else if (itemId == MENU_SECURID) {
-			return startFragActivity("TokenParentFragment");
-		} else if (itemId == MENU_SETTINGS) {
-			return startFragActivity("GeneralSettings");
-		} else {
-			return false;
-		}
-	}
+        public boolean onOptionsItemSelected(MenuItem item) {
+                final int itemId = item.getItemId();
+                if (itemId == MENU_ABOUT) {
+                        return startFragActivity("AboutFragment");
+                } else if (itemId == MENU_SETTINGS) {
+                        return startFragActivity("GeneralSettings");
+                } else {
+                        return false;
+                }
+        }
 
 }

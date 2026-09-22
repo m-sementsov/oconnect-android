@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:background="?attr/colorSurface"
     android:orientation="vertical">
 
@@ -11,8 +13,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorSurface"
         app:navigationIconTint="?attr/colorOnSurface"
-        app:titleTextColor="?attr/colorOnSurface"
-        xmlns:app="http://schemas.android.com/apk/res-auto" />
+        app:titleTextColor="?attr/colorOnSurface" />
 
     <EditText
         android:id="@+id/app_select_search"
@@ -46,6 +47,39 @@
             android:id="@+id/app_select_show_system_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <!-- ПЛАШКА ПРЕДУПРЕЖДЕНИЯ С ОРАНЖЕВОЙ ТОЧКОЙ И ТЕКСТОМ -->
+    <LinearLayout
+        android:id="@+id/panel_reconnect_warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_surface_panel"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="9dp"
+            android:layout_height="9dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_status_warning" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/split_tunnel_apps_reconnect_warning"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurface" />
 
     </LinearLayout>
 

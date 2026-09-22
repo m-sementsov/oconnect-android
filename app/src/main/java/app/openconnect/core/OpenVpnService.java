@@ -137,6 +137,11 @@ public class OpenVpnService extends VpnService {
 	public void onCreate() {
 		// Restore service state from disk if available
 		// This gets overwritten if somebody calls startService()
+                try {
+                        VpnService.prepare(this);
+                } catch (Exception ignored) {}
+		app.openconnect.LocaleUtil.apply(getApplicationContext());
+
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		mPrefs.registerOnSharedPreferenceChangeListener(mPreferenceListener);
 		mUUID = mPrefs.getString(ProfileManager.LAST_USED_PROFILE, "");
@@ -397,38 +402,48 @@ public class OpenVpnService extends VpnService {
 	}
 
 	@SuppressWarnings("deprecation")
-	private Notification buildNotification() {
-		boolean inputNeeded = mDialog != null && mActivityConnections == 0 &&
-				mPrefs.getBoolean(PREF_NOTIFY_USER_INPUT, true);
-		String channelId = inputNeeded
-				? NOTIFICATION_CHANNEL_INPUT : NOTIFICATION_CHANNEL_CONNECTION;
-		Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-				? new Notification.Builder(this, channelId)
-				: new Notification.Builder(this);
+        private Notification buildNotification() {
+                boolean inputNeeded = mDialog != null && mActivityConnections == 0 &&
+                                mPrefs.getBoolean(PREF_NOTIFY_USER_INPUT, true);
+                String channelId = inputNeeded
+                                ? NOTIFICATION_CHANNEL_INPUT : NOTIFICATION_CHANNEL_CONNECTION;
+                Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                                ? new Notification.Builder(this, channelId)
+                                : new Notification.Builder(this);
 
-		String title = getString(R.string.app);
-		String text;
-		if (inputNeeded) {
-			title = getString(R.string.notification_input_needed);
-			text = getString(R.string.notification_touch_here);
-		} else if (mConnectionState == OpenConnectManagementThread.STATE_CONNECTED &&
-				profile != null) {
-			text = getString(R.string.notification_connected_to, profile.getName());
-		} else if (profile != null) {
-			text = getString(R.string.notification_connecting_to, profile.getName());
-		} else {
-			text = getString(R.string.notification_vpn_active);
-		}
+                String target = "";
+                if (serverName != null && !serverName.isEmpty()) {
+                        target = serverName;
+                } else if (profile != null && profile.mPrefs != null) {
+                        target = profile.mPrefs.getString("server_address", "").trim();
+                }
+                if (target.isEmpty() && profile != null) {
+                        target = profile.getName();
+                }
 
-		return builder.setSmallIcon(R.drawable.ic_stat_vpn)
-				.setContentTitle(title)
-				.setContentText(text)
-				.setContentIntent(getMainActivityIntent())
-				.setCategory(Notification.CATEGORY_SERVICE)
-				.setOngoing(true)
-				.setOnlyAlertOnce(true)
-				.build();
-	}
+                String title = getString(R.string.app);
+                String text;
+                if (inputNeeded) {
+                        title = getString(R.string.notification_input_needed);
+                        text = getString(R.string.notification_touch_here);
+                } else if (mConnectionState == OpenConnectManagementThread.STATE_CONNECTED &&
+                                profile != null) {
+                        text = getString(R.string.notification_connected_to, target);
+                } else if (profile != null) {
+                        text = getString(R.string.notification_connecting_to, target);
+                } else {
+                        text = getString(R.string.notification_vpn_active);
+                }
+
+                return builder.setSmallIcon(R.drawable.ic_stat_vpn)
+                                .setContentTitle(title)
+                                .setContentText(text)
+                                .setContentIntent(getMainActivityIntent())
+                                .setCategory(Notification.CATEGORY_SERVICE)
+                                .setOngoing(true)
+                                .setOnlyAlertOnce(true)
+                                .build();
+        }
 
 	private void startForegroundNotification() {
 		int foregroundType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
@@ -532,6 +547,9 @@ public class OpenVpnService extends VpnService {
 		if (state == OpenConnectManagementThread.STATE_CONNECTED &&
 				mConnectionState != OpenConnectManagementThread.STATE_CONNECTED) {
 			startTime = new Date();
+                	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                	        setUnderlyingNetworks(null);
+                	}
 		}
 		mConnectionState = state;
 		wakeUpActivity();
@@ -602,10 +620,12 @@ public class OpenVpnService extends VpnService {
 		return mVPNLog.dump();
 	}
 
-	public String getReconnectName() {
-		VpnProfile p = ProfileManager.get(mUUID);
-		return p == null ? null : p.getName();
-	}
+        public String getReconnectName() {
+                VpnProfile p = ProfileManager.get(mUUID);
+                if (p == null) return null;
+                String server = p.mPrefs != null ? p.mPrefs.getString("server_address", "").trim() : "";
+                return !server.isEmpty() ? server : p.getName();
+        }
 
 	public String getReconnectUUID() {
 		return getReconnectName() == null ? null : mUUID;

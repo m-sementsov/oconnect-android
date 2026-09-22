@@ -113,15 +113,18 @@ public class GrantPermissionsActivity extends Activity {
 		setResult(resultCode);
 
 		if (resultCode == RESULT_OK) {
-	    	Intent intent = new Intent(getBaseContext(), OpenVpnService.class);
-	    	intent.putExtra(OpenVpnService.EXTRA_UUID, mUUID);
-			ContextCompat.startForegroundService(this, intent);
+                        try {
+                                VpnService.prepare(this);
+                        } catch (Exception ignored) {}
+	    		Intent intent = new Intent(getBaseContext(), OpenVpnService.class);
+	    		intent.putExtra(OpenVpnService.EXTRA_UUID, mUUID);
+				ContextCompat.startForegroundService(this, intent);
 
-	    	if (mStartActivity != null) {
-	    		intent = new Intent();
-	    		intent.setClassName(this, mStartActivity);
-	    		startActivity(intent);
-	    	}
+	    		if (mStartActivity != null) {
+	    			intent = new Intent();
+	    			intent.setClassName(this, mStartActivity);
+	    			startActivity(intent);
+	    		}
 		}
 		finish();
 	}

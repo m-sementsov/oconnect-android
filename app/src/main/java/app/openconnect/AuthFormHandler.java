@@ -288,6 +288,10 @@ public class AuthFormHandler extends UserDialog
 				"passwd".equals(normalized)) {
 			return mContext.getString(R.string.login_password);
 		}
+		if (normalized.contains("pkcs#12") || normalized.contains("pass phrase") ||
+				normalized.contains("passphrase") || normalized.contains("private key")) {
+			return mContext.getString(R.string.p12_password_prompt);
+		}
 		return cleaned;
 	}
 
@@ -373,15 +377,9 @@ public class AuthFormHandler extends UserDialog
 	}
 
 	private View newAutomaticLoginHintView() {
-		TextView summary = new TextView(mContext);
-		summary.setText(noSave
-				? R.string.automatic_login_cache_disabled_hint
-				: R.string.automatic_login_password_hint_short);
-		summary.setTextSize(12);
-		summary.setAlpha(0.72f);
-		summary.setPadding(dp(4), 0, dp(4), dp(8));
-		summary.setLayoutParams(blockParams());
-		return summary;
+		View v = new View(mContext);
+		v.setVisibility(View.GONE);
+		return v;
 	}
 
 	private String getDisplayMessage() {
@@ -578,21 +576,16 @@ public class AuthFormHandler extends UserDialog
 		}
 		if (hasPassword) {
 			if (!noSave) {
-				boolean savePass = !getStringPref(formPfx + "savePass").equals("false");
-				savePassword = newSavePasswordView(savePass);
-				automaticLogin = newAutomaticLoginView(
-						batchMode == BATCH_MODE_EMPTY_ONLY || batchMode == BATCH_MODE_ENABLED);
-				automaticLogin.setEnabled(savePass);
-				savePassword.setOnCheckedChangeListener((button, checked) -> {
-					automaticLogin.setEnabled(checked);
-					if (!checked) {
-						automaticLogin.setChecked(false);
-					}
-				});
+				savePassword = newSavePasswordView(true);
+				savePassword.setChecked(true);
+				savePassword.setVisibility(View.GONE);
+				automaticLogin = newAutomaticLoginView(true);
+				automaticLogin.setChecked(true);
+				automaticLogin.setVisibility(View.GONE);
 				v.addView(savePassword);
 				v.addView(automaticLogin);
 			}
-			v.addView(newAutomaticLoginHintView());
+			// hint removed
 		}
 
 		if (batchMode == BATCH_MODE_ABORTED) {
@@ -607,11 +600,16 @@ public class AuthFormHandler extends UserDialog
 			return;
 		}
 
-		mAlert = new AlertDialog.Builder(mContext)
+		android.content.SharedPreferences appSp = mContext.getSharedPreferences("app_settings", Context.MODE_PRIVATE);
+		boolean isRu = !"en".equals(appSp.getString("app_lang", "ru"));
+		String btnOk = isRu ? "ОК" : "OK";
+		String btnCancel = isRu ? "Отмена" : "Cancel";
+
+		v.setPadding(dp(24), dp(20), dp(24), dp(8));
+                mAlert = new AlertDialog.Builder(mContext)
 				.setView(v)
-				.setTitle(mContext.getString(R.string.login_title, getStringPref("profile_name")))
-				.setPositiveButton(R.string.ok, h)
-				.setNegativeButton(R.string.cancel, h)
+				.setPositiveButton(btnOk, h)
+				.setNegativeButton(btnCancel, h)
 				.create();
 		mAlert.setOnDismissListener(h);
 

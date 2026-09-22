@@ -1,2 +1,11 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<resources/>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="connection_states">
+        <item>Проверка данных...</item>
+        <item>Ожидание ввода...</item>
+        <item>Авторизация...</item>
+        <item>Подключение...</item>
+        <item>Подключено</item>
+        <item>Отключено</item>
+    </string-array>
+</resources>

@@ -31,7 +31,6 @@ import android.os.Bundle;
 import app.openconnect.core.OpenVpnService;
 import app.openconnect.core.VPNConnector;
 import app.openconnect.fragments.*;
-import app.openconnect.update.GitHubUpdateChecker;
 
 public class MainActivity extends ToolbarActivity {
 
@@ -41,6 +40,14 @@ public class MainActivity extends ToolbarActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+                // Применяем сохраненный язык при старте
+                android.content.SharedPreferences appSp = getSharedPreferences("app_settings", MODE_PRIVATE);
+                String lang = appSp.getString("app_lang", "ru");
+                java.util.Locale locale = new java.util.Locale(lang);
+                java.util.Locale.setDefault(locale);
+                android.content.res.Configuration config = new android.content.res.Configuration();
+                config.setLocale(locale);
+                getResources().updateConfiguration(config, getResources().getDisplayMetrics());
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_dashboard);
@@ -63,7 +70,6 @@ public class MainActivity extends ToolbarActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		GitHubUpdateChecker.checkAutomatically(this);
 
 		mConn = new VPNConnector(this, true) {
 			@Override

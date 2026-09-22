@@ -58,6 +58,9 @@ public class AppSelectActivity extends ToolbarActivity {
     private final List<AppEntry> mLaunchableApps = new ArrayList<>();
     private final Set<String> mSelected = new HashSet<>();
 
+    private final Set<String> mInitialSelected = new HashSet<>();
+    private View mWarningBanner;
+
     private ListView mListView;
     private EditText mSearchBox;
     private MaterialSwitch mShowSystemSwitch;
@@ -66,6 +69,13 @@ public class AppSelectActivity extends ToolbarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        android.content.SharedPreferences appSp = getSharedPreferences("app_settings", MODE_PRIVATE);
+        String lang = appSp.getString("app_lang", "ru");
+        java.util.Locale locale = new java.util.Locale(lang);
+        java.util.Locale.setDefault(locale);
+        android.content.res.Configuration config = new android.content.res.Configuration();
+        config.setLocale(locale);
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_select);
         setupToolbar(R.id.toolbar, getString(R.string.app_select_title), true);
@@ -76,10 +86,11 @@ public class AppSelectActivity extends ToolbarActivity {
                 pkg = pkg.trim();
                 if (!pkg.isEmpty()) {
                     mSelected.add(pkg);
+                    mInitialSelected.add(pkg);
                 }
             }
         }
-
+        mWarningBanner = findViewById(R.id.panel_reconnect_warning);
         mListView = findViewById(R.id.app_select_list);
         mSearchBox = findViewById(R.id.app_select_search);
         mShowSystemSwitch = findViewById(R.id.app_select_show_system_switch);
@@ -95,6 +106,7 @@ public class AppSelectActivity extends ToolbarActivity {
                 mSelected.remove(entry.packageName);
             }
             mAdapter.notifyDataSetChanged();
+            updateWarningBanner(); 
         });
 
         mSearchBox.addTextChangedListener(new TextWatcher() {
@@ -185,6 +197,12 @@ public class AppSelectActivity extends ToolbarActivity {
                 applyFilter();
             });
         }, "AppSelectLoader").start();
+    }
+
+    private void updateWarningBanner() {
+        if (mWarningBanner == null) return;
+        boolean changed = !mSelected.equals(mInitialSelected);
+        mWarningBanner.setVisibility(changed ? View.VISIBLE : View.GONE);
     }
 
     private void applyFilter() {

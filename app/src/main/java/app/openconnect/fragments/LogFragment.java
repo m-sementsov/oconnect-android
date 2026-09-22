@@ -117,7 +117,7 @@ public class LogFragment extends ListFragment {
 					mCancelButton.setVisible(service.getReconnectName() != null);
 					mDisconnected = true;
 				} else {
-					title = getString(R.string.disconnect);
+					title = getString(R.string.disconnect_vpn);
 					mCancelButton.setIcon(R.drawable.ic_close_24);
 					mCancelButton.setVisible(true);
 					mDisconnected = false;

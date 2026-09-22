@@ -5,8 +5,8 @@
     <item android:id="@+id/cancel"
 		android:icon="@drawable/ic_close_24"
 		app:showAsAction="ifRoom|withText"
-		android:title="@string/disconnect"
-		android:titleCondensed="@string/disconnect" />
+		android:title="@string/disconnect_vpn"
+		android:titleCondensed="@string/disconnect_vpn" />
     <item
         android:id="@+id/clearlog"
         android:icon="@drawable/ic_delete_24"

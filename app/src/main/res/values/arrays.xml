@@ -70,6 +70,16 @@
         <item>Disconnected</item>
     </string-array>
 
+    <string-array name="language_entries">
+        <item>Русский</item>
+        <item>English</item>
+    </string-array>
+    
+    <string-array name="language_values">
+        <item>ru</item>
+        <item>en</item>
+    </string-array>
+
     <string-array name="faq_text">
         <item>How do I add a VPN profile?</item>
         <item>Tap Add VPN profile, enter the gateway address from your school or company, then save. Most users only need the server address at first. Certificates, software tokens, and advanced network options can stay empty unless your VPN administrator asks for them.</item>

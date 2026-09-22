@@ -51,8 +51,6 @@ import android.util.Base64;
 
 import org.infradead.libopenconnect.LibOpenConnect;
 
-import com.stericson.RootTools.execution.CommandCapture;
-import com.stericson.RootTools.execution.Shell;
 
 import app.openconnect.AuthFormHandler;
 import app.openconnect.R;
@@ -258,11 +256,23 @@ public class OpenConnectManagementThread implements Runnable, OpenVPNManagement 
 			mOpenVPNService.log(level, "LIB: " + msg.trim());
 		}
 
-		public void onProtectSocket(int fd) {
-			if (mOpenVPNService.protect(fd) != true) {
-				log("Error protecting fd " + fd);
-			}
-		}
+                public void onProtectSocket(int fd) {
+                        boolean ok = mOpenVPNService.protect(fd);
+                        if (!ok) {
+                                // На холодном старте даем системе 100 мс на IPC-синхронизацию и пробуем еще раз
+                                try { Thread.sleep(100); } catch (Exception ignored) {}
+                                ok = mOpenVPNService.protect(fd);
+                        }
+                        if (!ok) {
+                                log("Error protecting fd " + fd);
+                        }
+                }
+
+		// public void onProtectSocket(int fd) {
+		// 	if (mOpenVPNService.protect(fd) != true) {
+		// 		log("Error protecting fd " + fd);
+		// 	}
+		// }
 
 		public void onStatsUpdate(LibOpenConnect.VPNStats stats) {
 			mOpenVPNService.setStats(OpenConnectManagementThread.this, stats);
@@ -272,17 +282,6 @@ public class OpenConnectManagementThread implements Runnable, OpenVPNManagement 
 	@Override
 	public void run() {
 		logStats();
-
-		try {
-			if (mAppPrefs.getBoolean("loadTunModule", false)) {
-				Shell.runRootCommand(new CommandCapture(0, "insmod /system/lib/modules/tun.ko"));
-			}
-			if (mAppPrefs.getBoolean("useCM9Fix", false)) {
-				Shell.runRootCommand(new CommandCapture(0, "chown 1000 /dev/tun"));
-			}
-		} catch (Exception e) {
-			log("error running root commands: " + e.getLocalizedMessage());
-		}
 
 		if (!runVPN()) {
 			log("VPN terminated with errors");
@@ -652,18 +651,10 @@ public class OpenConnectManagementThread implements Runnable, OpenVPNManagement 
 	 * routed through the tunnel; everything else bypasses the VPN.
 	 */
 	private void applyAppFilter(VpnService.Builder b) {
-		if (!getBoolPref("split_tunnel_apps_enabled")) {
-			return;
-		}
-
 		String pkgList = getStringPref("split_tunnel_apps_list");
 		if (pkgList == null || pkgList.trim().isEmpty()) {
 			log("APP FILTER: per-app VPN is enabled but no apps are selected");
 			return;
-		}
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-			b.setUnderlyingNetworks(null);
 		}
 
 		int count = 0;
@@ -766,13 +757,30 @@ public class OpenConnectManagementThread implements Runnable, OpenVPNManagement 
 		setIPInfo(b);
 		applyAppFilter(b);
 
-		ParcelFileDescriptor pfd;
-		try {
-			pfd = b.establish();
-		} catch (Exception e) {
-			log("Exception during establish(): " + e.getLocalizedMessage());
-			return false;
-		}
+                ParcelFileDescriptor pfd = null;
+                for (int attempt = 1; attempt <= 3; attempt++) {
+                        try {
+                                pfd = b.establish();
+                                if (pfd != null) {
+                                        break; // Успешно создан!
+                                }
+                        } catch (Exception e) {
+                                log("Exception during establish() attempt " + attempt + ": " + e.getLocalizedMessage());
+                        }
+                        
+                        log("b.establish() returned null, waiting for system VPN service (attempt " + attempt + "/3)...");
+                        try {
+                                Thread.sleep(200);
+                        } catch (InterruptedException ignored) {}
+                }
+
+		// ParcelFileDescriptor pfd;
+		// try {
+		// 	pfd = b.establish();
+		// } catch (Exception e) {
+		// 	log("Exception during establish(): " + e.getLocalizedMessage());
+		// 	return false;
+		// }
 
 		if (pfd == null || mOC.setupTunFD(pfd.getFd()) != 0) {
 			log("Error setting up tunnel fd");

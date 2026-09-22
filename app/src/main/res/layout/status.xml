@@ -18,7 +18,7 @@
         android:paddingEnd="24dp"
         android:paddingBottom="32dp">
 
-        <!-- HEADER -->
+	<!-- HEADER -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
@@ -38,14 +38,15 @@
                 android:textSize="22sp"
                 tools:ignore="SelectableText" />
 
-            <ImageButton
-                android:id="@+id/dashboard_overflow"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_main_menu"
+                style="@style/Widget.Material3.Button.IconButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/dashboard_more_options"
-                android:padding="12dp"
-                android:src="@drawable/ic_more_vert_24" />
+                android:layout_marginEnd="-8dp"
+                android:contentDescription="@string/generalsettings"
+                app:icon="@drawable/ic_more_vert_24"
+                app:iconTint="?attr/colorOnSurface" />
 
         </LinearLayout>
 
@@ -88,17 +89,12 @@
 
         <TextView
             android:id="@+id/connection_profile"
-                android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
-            android:includeFontPadding="false"
-            android:maxLines="1"
+            android:visibility="gone"
             android:textColor="@color/dashboard_primary_text"
-            android:textSize="24sp"
-            tools:text="VPN" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/connection_time"
@@ -141,7 +137,7 @@
             app:strokeColor="@color/dashboard_accent"
             app:strokeWidth="1dp" />
 
-        <!-- DASHBOARD SETTINGS CARD -->
+        <!-- DASHBOARD SETTINGS CARD (3 ROWS ONLY) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -248,7 +244,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="P12 Key"
+                        android:text="@string/p12_key"
                         android:textColor="@color/dashboard_secondary_text"
                         android:textSize="12sp" />
                     <TextView
@@ -278,12 +274,14 @@
                 android:layout_marginEnd="18dp"
                 android:background="@color/dashboard_surface_outline" />
 
-            <!-- 3. PER-APP VPN SWITCH -->
+            <!-- 3. ВЫБОРОЧНЫЙ VPN (БЕЗ ТУМБЛЕРА) -->
             <LinearLayout
-                android:id="@+id/row_per_app_switch"
+                android:id="@+id/row_select_apps"
                 android:layout_width="match_parent"
                 android:layout_height="72dp"
                 android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingStart="18dp"
@@ -315,58 +313,12 @@
                         android:textColor="@color/dashboard_primary_text"
                         android:textSize="16sp" />
                     <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/split_tunnel_apps_enabled_summary"
-                        android:textColor="@color/dashboard_secondary_text"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/switch_per_app"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-            <!-- 4. SELECT APPS -->
-            <View
-                android:id="@+id/divider_select_apps"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="18dp"
-                android:layout_marginEnd="18dp"
-                android:background="@color/dashboard_surface_outline" />
-
-            <LinearLayout
-                android:id="@+id/row_select_apps"
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="78dp"
-                android:paddingEnd="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/split_tunnel_apps_select"
-                        android:textColor="@color/dashboard_primary_text"
-                        android:textSize="15sp" />
-                    <TextView
                         android:id="@+id/text_apps_count"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:text="@string/split_tunnel_apps_none_selected"
                         android:textColor="@color/dashboard_secondary_text"
                         android:textSize="12sp" />
