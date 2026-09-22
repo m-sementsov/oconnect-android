@@ -35,8 +35,8 @@ import android.view.View;
 
 public class ConnectionEditorActivity extends ToolbarActivity {
 
-    public static final String EXTRA_PROFILE_UUID = "io.pengyue.oconnect.profile_uuid";
-    public static final String EXTRA_SCREEN = "io.pengyue.oconnect.profile_settings_screen";
+    public static final String EXTRA_PROFILE_UUID = "io.msem.oconnect.profile_uuid";
+    public static final String EXTRA_SCREEN = "io.msem.oconnect.profile_settings_screen";
     public static final String SCREEN_MAIN = "main";
     public static final String SCREEN_AUTHENTICATION = "authentication";
     public static final String SCREEN_ADVANCED = "advanced";

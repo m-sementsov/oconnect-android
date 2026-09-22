@@ -61,13 +61,13 @@ public class OpenVpnService extends VpnService {
 
 	public static final String TAG = "OConnect";
 
-	public static final String START_SERVICE = "io.pengyue.oconnect.START_SERVICE";
-	public static final String START_SERVICE_STICKY = "io.pengyue.oconnect.START_SERVICE_STICKY";
-	public static final String ALWAYS_SHOW_NOTIFICATION = "io.pengyue.oconnect.NOTIFICATION_ALWAYS_VISIBLE";
+	public static final String START_SERVICE = "io.msem.oconnect.START_SERVICE";
+	public static final String START_SERVICE_STICKY = "io.msem.oconnect.START_SERVICE_STICKY";
+	public static final String ALWAYS_SHOW_NOTIFICATION = "io.msem.oconnect.NOTIFICATION_ALWAYS_VISIBLE";
 
-	public static final String ACTION_VPN_STATUS = "io.pengyue.oconnect.VPN_STATUS";
-	public static final String EXTRA_CONNECTION_STATE = "io.pengyue.oconnect.connectionState";
-	public static final String EXTRA_UUID = "io.pengyue.oconnect.UUID";
+	public static final String ACTION_VPN_STATUS = "io.msem.oconnect.VPN_STATUS";
+	public static final String EXTRA_CONNECTION_STATE = "io.msem.oconnect.connectionState";
+	public static final String EXTRA_UUID = "io.msem.oconnect.UUID";
 	public static final String PREF_NOTIFY_USER_INPUT = "notify_user_input";
 
 	// These are valid in the CONNECTED state

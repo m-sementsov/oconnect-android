@@ -45,7 +45,7 @@ public class KeepAlive extends BroadcastReceiver {
 
 	public static final String TAG = "OConnect";
 
-	public static final String ACTION_KEEPALIVE_ALARM = "io.pengyue.oconnect.KEEPALIVE_ALARM";
+	public static final String ACTION_KEEPALIVE_ALARM = "io.msem.oconnect.KEEPALIVE_ALARM";
 
 	private boolean mConnectionActive;
 	private boolean mQueryInFlight;

@@ -37,9 +37,9 @@ import java.util.Set;
 public class AppSelectActivity extends ToolbarActivity {
 
     /** Comma-separated list of currently selected package names (in). */
-    public static final String EXTRA_SELECTED = "io.pengyue.oconnect.APP_SELECT_SELECTED";
+    public static final String EXTRA_SELECTED = "io.msem.oconnect.APP_SELECT_SELECTED";
     /** Comma-separated list of selected package names (out, via setResult). */
-    public static final String EXTRA_RESULT = "io.pengyue.oconnect.APP_SELECT_RESULT";
+    public static final String EXTRA_RESULT = "io.msem.oconnect.APP_SELECT_RESULT";
 
     private static class AppEntry implements Comparable<AppEntry> {
         String label;

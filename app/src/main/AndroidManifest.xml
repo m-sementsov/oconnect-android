@@ -22,7 +22,7 @@
     <!-- Copy the <permission> block to your app when using the REMOTE API. Otherwise OConnect
         needs to be installed first -->
     <permission
-        android:name="io.pengyue.oconnect.REMOTE_API"
+        android:name="io.msem.oconnect.REMOTE_API"
         android:description="@string/permission_description"
         android:label="Control OConnect"
         android:protectionLevel="dangerous" />
@@ -147,16 +147,16 @@
 <!--
         <service
             android:name="app.openconnect.api.ExternalOpenVPNService"
-            android:permission="io.pengyue.oconnect.REMOTE_API" >
+            android:permission="io.msem.oconnect.REMOTE_API" >
             <intent-filter>
-                <action android:name="io.pengyue.oconnect.api.IOpenVPNAPIService" />
+                <action android:name="io.msem.oconnect.api.IOpenVPNAPIService" />
             </intent-filter>
         </service>
 -->
 
         <activity
             android:exported="true"
-            android:permission="io.pengyue.oconnect.REMOTE_API"
+            android:permission="io.msem.oconnect.REMOTE_API"
             android:name="app.openconnect.api.GrantPermissionsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -164,7 +164,7 @@
         </activity>
         <activity
             android:exported="true"
-            android:permission="io.pengyue.oconnect.REMOTE_API"
+            android:permission="io.msem.oconnect.REMOTE_API"
             android:name="app.openconnect.api.ConfirmDialog" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -181,7 +181,7 @@
 
         <provider
             android:name="app.openconnect.FileProvider"
-            android:authorities="io.pengyue.oconnect.FileProvider"
+            android:authorities="io.msem.oconnect.FileProvider"
             android:exported="false"
             android:grantUriPermissions="true"
             tools:ignore="ExportedContentProvider" />
